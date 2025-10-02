@@ -1,0 +1,28 @@
+
+ DESCRIPCIÓN DEL CONTENIDO SUBIDO
+==================================
+
+La subida contiene los siguientes archivos:
+
+- Fichero zip con el contenido de la carpeta Avoris en Linux
+- Memoria del proyecto
+
+ GUIA BÁSICA DE COMANDOS
+=========================
+
+Ver opciones de ejecución con make en /Avoris
+make y make --help muestra el menú de reglas que se pueden ejecutar
+
+make start: levanta los contenedores
+make stop: para los contenedores
+make ssh-be se conecta con el contenedor de Symfony 6.2 y PHP 8.2
+make run: despliega despliega el servidor de symfony
+http://localhost/swagger para acceder a la documentación de la APP
+
+Entrar en directorio /Avoris y entrar en el contenedor de MYSQL
+docker exec -it avoris-php84-symfony62-mysql mysql -u root -p
+Pedirá la password porque el comando lleva opción -p
+Una vez dentro podrá lanzar consultas a la BD
+
+Entrar en directorio /Avoris y entrar en el contenedor de redis
+docker exec -it avoris-php84-symfony62-redis redis-cli
