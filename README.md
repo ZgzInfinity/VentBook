@@ -25,32 +25,6 @@ El desarrollo se ha centrado en una estructura hexagonal, con una separación cl
 
 ---
 
-## Tecnologías Utilizadas
-
-- **Lenguaje y Framework:** PHP 8.2.0 con Symfony 6.2  
-- **Base de datos relacional:** MySQL 8.0.26  
-- **Caché en memoria:** Redis 7.0 (Alpine)  
-- **Contenedores:** Docker + Docker Compose  
-- **Virtualización:** VirtualBox con Ubuntu 24.04 LTS  
-- **Pruebas:** PHPUnit 9.6  
-- **Documentación de API:** Swagger UI 5.27.1  
-- **IDE y herramientas:** Visual Studio Code, DBeaver, Postman
-
----
-
-## Arquitectura y Despliegue
-
-La arquitectura se organiza en **capas y contenedores Docker**:
-
-- **Makefile:** Automatiza la gestión de contenedores, construcción de imágenes, ejecución del servidor Symfony, y visualización de logs.  
-- **docker-compose.yml:** Define la red Docker y los contenedores:  
-  - `avoris-php84-symfony62`: Backend PHP/Symfony  
-  - `avoris-php84-symfony62-mysql`: Base de datos MySQL  
-  - `avoris-php84-symfony62-redis`: Caché Redis  
-- **Red y volúmenes:** Red personalizada `avoris-php84-symfony62-network` y volúmenes persistentes para MySQL y Redis.
-
----
-
 ## Capa de Infraestructura
 
 ### Entidades
@@ -81,7 +55,7 @@ Reserva:
 
 # VentBook - API de Gestión de Eventos y Reservas
 
-## Descripción del Proyecto
+## Estructura del Proyecto
 VentBook es una API desarrollada para la gestión integral de eventos y reservas, diseñada siguiendo buenas prácticas de arquitectura, desarrollo y testing profesional. La aplicación está basada en Symfony 6.2 y PHP 8.2, con un enfoque en **arquitectura hexagonal**, separación de capas y contenedores Docker para garantizar modularidad, escalabilidad y mantenibilidad.  
 
 El proyecto incluye:  
