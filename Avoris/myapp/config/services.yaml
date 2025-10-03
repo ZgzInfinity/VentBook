@@ -1,0 +1,52 @@
+# config/services.yaml
+
+parameters:
+    # Parámetros conexión BD
+    database_write_dsn: 'mysql:host=avoris-php84-symfony62-mysql;dbname=mysql_symfony_avoris'
+    database_write_user: 'avoris'
+    database_write_password: 'avoris'
+
+    database_read_dsn: 'mysql:host=avoris-php84-symfony62-mysql;dbname=mysql_symfony_avoris'
+    database_read_user: 'avoris'
+    database_read_password: 'avoris'
+
+services:
+    # Config por defecto
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        public: false
+
+    # Autocarga todo lo de src/ como servicios
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    #######################################################################
+    # Servicios manuales para conexión base de datos
+    #######################################################################
+
+    # PDO escritura
+    PDO.write:
+        class: PDO
+        arguments:
+            - '%database_write_dsn%'
+            - '%database_write_user%'
+            - '%database_write_password%'
+
+    # PDO lectura
+    PDO.read:
+        class: PDO
+        arguments:
+            - '%database_read_dsn%'
+            - '%database_read_user%'
+            - '%database_read_password%'
+
+    # Gestor de conexiones (inyecta los PDO anteriores)
+    App\Manager\ConnectionManager:
+        arguments:
+            $writeConnection: '@PDO.write'
+            $readConnection: '@PDO.read'

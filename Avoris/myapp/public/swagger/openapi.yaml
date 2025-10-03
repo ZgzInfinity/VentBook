@@ -1,0 +1,257 @@
+openapi: 3.0.3
+info:
+  title: Avoris Event Booking API
+  description: API for managing events and user bookings
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:1000/
+
+paths:
+  /events:
+    post:
+      summary: Create a new event to assign bookings
+      tags:
+        - Events
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventCreate'
+      responses:
+        '201':
+          description: Event successfully created
+        '400':
+          description: Invalid event format
+        '422':
+          description: Unknown event format
+        '500':
+          description: Internal server error
+
+    get:
+      summary: List events with optional filters
+      tags:
+        - Events
+      parameters:
+        - in: query
+          name: filters
+          description: JSON array as string with filters (can be empty or contain values)
+          required: false
+          schema:
+            type: string
+          examples:
+            example1:
+              summary: Filter by event name
+              value: '[{"EVENT_FILTER_NAME":"Concierto de Rock"}]'
+            example2:
+              summary: Filter by availability
+              value: '[{"EVENT_FILTER_AVAILABLE":4}]'
+            example3:
+              summary: Multiple filters
+              value: '[{"EVENT_FILTER_NAME":"Concierto de Rock"},{"EVENT_FILTER_AVAILABLE":4}]'
+            example4:
+              summary: Multiple filters two
+              value: '[{"EVENT_FILTER_START_DATE": "2030-03-15"}, {"EVENT_FILTER_END_DATE": "2030-03-31"}]'
+      responses:
+        '200':
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventInfo'
+        '400':
+          description: Invalid filters format
+        '404':
+          description: No events found
+        '422':
+          description: Unknown filters params
+        '500':
+          description: Internal server error
+
+
+  /events/{id}:
+    get:
+      summary: Get event details
+      tags:
+        - Events
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Event displayed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventInfoData'
+        '404':
+          description: Event not found
+        '500':
+          description: Internal server error
+
+  /bookings:
+    post:
+      summary: Create a booking for an event
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingCreate'
+      responses:
+        '201':
+          description: Booking successfully created
+        '400':
+          description: Unknown booking format
+        '422':
+          description: Invalid booking input
+        '500':
+          description: Internal server error
+
+  /bookings/{id}:
+    get:
+      summary: List bookings of user by identification
+      tags:
+        - Bookings
+      parameters:
+        - in: path
+          name: id
+          example: MNBVCXZLKJ12
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking list found successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingInfoData'
+        '400':
+          description: Invalid input identification format
+        '422':
+          description: Invalid input identification data
+        '500':
+          description: Internal server error
+
+  /bookings/{id}/cancel:
+    delete:
+      summary: Cancel a booking
+      tags:
+        - Bookings
+      parameters:
+        - in: path
+          name: id
+          example: BK001
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Booking cancelled successfully
+        '400':
+          description: Invalid booking id
+        '404':
+          description: Booking not found
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    EventCreate:
+      type: object
+      required: [name, description, from_date, to_date, available_seats]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        available_seats:
+          type: integer
+          minimum: 0
+
+    EventInfo:
+      type: object
+      required: [name, description, from_date, to_date, available_seats]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        available_seats:
+          type: integer
+
+    EventInfoData:
+      type: object
+      required: [name, from_date, to_date, available_seats]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        from_date:
+          type: string
+          format: date
+        to_date:
+          type: string
+          format: date
+        available_seats:
+          type: integer
+
+    BookingCreate:
+      type: object
+      required: [reference, event_id, event_date, attendees, identification]
+      properties:
+        reference:
+          type: string
+        event_id:
+          type: integer
+        event_date:
+          type: string
+          format: date
+        attendees:
+          type: integer
+          minimum: 1
+        identification:
+          type: string
+
+    BookingInfoData:
+      required: [reference, event_id, event_date, attendees, identification]
+      type: object
+      properties:
+        reference:
+          type: string
+        event_id:
+          type: integer
+        event_date:
+          type: string
+          format: date
+        attendees:
+          type: integer
+          minimum: 1
+        identification:
+          type: string

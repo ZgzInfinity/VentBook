@@ -1,0 +1,43 @@
+FROM php:8.2.0-fpm
+
+ARG UID
+
+# -------- Crear usuario con el mismo UID que el host --------
+RUN adduser -u ${UID} --disabled-password --gecos "" user \
+    && mkdir -p /home/user/.ssh \
+    && chown -R user:user /home/user/ \
+    && echo "StrictHostKeyChecking no" >> /home/user/.ssh/config \
+    && echo "alias sf=/appdata/www/bin/console" >> /home/user/.bashrc
+
+# -------- Instalar extensiones PHP y dependencias --------
+RUN apt update \
+    && apt install -y git acl unzip zip wget curl \
+                      openssl openssh-client \
+                      libicu-dev libxml2-dev libzip-dev zlib1g-dev \
+    && docker-php-ext-install intl pdo pdo_mysql zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && pecl install xdebug \
+    && docker-php-ext-enable --ini-name 05-opcache.ini opcache xdebug
+
+# -------- Instalar Composer --------
+RUN curl -sS https://getcomposer.org/installer | php \
+    && mv composer.phar /usr/bin/composer \
+    && chmod +x /usr/bin/composer \
+    && composer self-update
+
+# -------- Instalar PHP-CS-FIXER --------
+RUN wget https://cs.symfony.com/download/php-cs-fixer-v3.phar -O php-cs-fixer \
+    && chmod +x php-cs-fixer \
+    && mv php-cs-fixer /usr/local/bin/php-cs-fixer
+
+# -------- Instalar Symfony CLI (correctamente) --------
+RUN wget https://get.symfony.com/cli/installer -O - | bash \
+    && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+
+# -------- Configuración final --------
+RUN mkdir -p /appdata/www
+COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
+USER user
+WORKDIR /appdata/www
